@@ -321,7 +321,7 @@ def find_patterns(ticker,exchange, stock_data,  interval_key, max_base_candles,r
 
                                 # time_in_exit = exit_index - entry_index
                                 Pattern_name_is = 'DZ(DBR)' if stock_data['open'].iloc[legin_candle_index] > stock_data['close'].iloc[legin_candle_index] else 'DZ(RBR)'
-                                legin_base_legout_ranges = f"{round(legin_candle_range)}:{round(actual_base_candle_range)}:{round(legout_candle_range)}"
+                                legin_base_legout_ranges = f"{round(legin_candle_range / actual_base_candle_range)}:1:{round(legout_candle_range / actual_base_candle_range)}"
 
                                 #ohlc_data = capture_ohlc_data(stock_data, exit_index, i)
                                 #print(f"entry date is :{stock_data.index[m]}")
@@ -383,8 +383,9 @@ def find_patterns(ticker,exchange, stock_data,  interval_key, max_base_candles,r
                                       patterns.append({
                                             'symbol': ticker,
                                             'exchange':exchange,
+                                            'timeframe': interval_key,                                          
                                             'zone_distance':zone_distance,
-                                            'timeframe': interval_key,
+                                            'zone_strength' : legin_base_legout_ranges,
                                             'zone_status': Zone_status,
                                             'zone_type': Pattern_name_is,  # corrected
                                             'entry_price': max_high_price,  # corrected
@@ -573,7 +574,9 @@ def find_patterns(ticker,exchange, stock_data,  interval_key, max_base_candles,r
 
                                 latest_closing_price = round(stock_data['close'].iloc[-1], 2)
                                 zone_distance = (min(low_prices) - math.floor(latest_closing_price)) / min(low_prices) * 100
+                                legin_base_legout_ranges = f"{round(legin_candle_range / actual_base_candle_range)}:1:{round(legout_candle_range / actual_base_candle_range)}"
 
+                                
                                 if ((fresh_zone_allowed and Zone_status == 'Fresh') or \
                                    (target_zone_allowed and (Zone_status == 'Tested' or Zone_status == 'Successful')) or \
                                    (stoploss_zone_allowed and Zone_status == 'Failed') or \
@@ -628,8 +631,9 @@ def find_patterns(ticker,exchange, stock_data,  interval_key, max_base_candles,r
                                        patterns.append({
                                             'symbol': ticker,
                                             'exchange': exchange,
+                                            'timeframe': interval_key,                                           
                                             'zone_distance':zone_distance,
-                                            'timeframe': interval_key,
+                                            'zone_strength' : legin_base_legout_ranges,                                            
                                             'zone_status': Zone_status,
                                             'zone_type': Pattern_name_is,  # corrected
                                             'entry_price': min_low_price,  # corrected
@@ -667,7 +671,7 @@ def batch_insert_candles(cursor, data_to_insert):
         batch = data_to_insert[i:i + batch_size]
         insert_query = """
             INSERT INTO zone_data (
-                symbol, exchange, zone_distance,timeframe,
+                symbol, exchange,timeframe, zone_distance,zone_strength,
                 zone_status, zone_type, entry_price, stop_loss, target,
                 legin_date, base_count, legout_count, legout_date,
                 entry_date, exit_date,
@@ -675,9 +679,10 @@ def batch_insert_candles(cursor, data_to_insert):
                 is_wick_in_legin, is_legin_tr_pass, is_legout_covered,
                 is_one_two_ka_four
             )
-            VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 zone_distance = VALUES(zone_distance),
+                zone_strength = VALUE(zone_strength),
                 entry_price = VALUES(entry_price),
                 stop_loss = VALUES(stop_loss),
                 target = VALUES(target),
@@ -859,9 +864,10 @@ def fetch_data_endpoint(timeframe):
               CREATE TABLE IF NOT EXISTS zone_data (
                   id INT AUTO_INCREMENT PRIMARY KEY,
                   symbol VARCHAR(20),
-                  zone_distance DECIMAL(10, 2),
                   exchange VARCHAR(20),
                   timeframe VARCHAR(20),
+                  zone_distance DECIMAL(10, 2),
+                  zone_strength VARCHAR(20), 
                   zone_status VARCHAR(10),
                   zone_type VARCHAR(8),
                   entry_price DECIMAL(10, 2),
