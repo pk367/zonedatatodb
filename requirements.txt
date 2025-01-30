@@ -1,2 +1,3 @@
 git+https://github.com/pk367/datafeed.git 
 mysql-connector-python
+streamlit
