@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 def create_db_config(suffix):
     try:
         return {
-            'user': f'u417995338_stocksZoneData',
+            'user': f'u417995338_nseZoneData',
             'password': 'Host@0904',
             'host': 'srv1668.hstgr.io',
-            'database': f'u417995338_stocksZoneData',
+            'database': f'u417995338_nseZoneData',
             'connection_timeout': 100000  # Set connection timeout
         }
     except Exception as e:
@@ -708,7 +708,7 @@ def batch_insert_candles(cursor, data_to_insert):
             print(f"Error during batch insert: {e}")
             raise
 
-def fetch_data_endpoint():
+def fetch_data_endpoint(timeframe):
     exchange = "NSE"
     # List of symbols
     symbols = [ 'ADANIENSOL',
@@ -747,8 +747,7 @@ def fetch_data_endpoint():
     ]
     #symbols = symbolslist[50:]
     # List of time frames
-    intervals = [ "in_1_minute", "in_3_minute" , "in_5_minute", "in_10_minute", "in_15_minute", "in_30_minute", "in_75_minute", "in_125_minute", "in_1_hour", "in_2_hour", "in_daily", "in_weekly", "in_monthly" ]
-
+    intervals = [timeframe]
     n_bars = 5000
     fut_contract = None
 
@@ -906,6 +905,7 @@ def fetch_data_endpoint():
                   connections['zone'].close()
 
 if __name__ == "__main__":
-    result = fetch_data_endpoint()
+    timeframe = st.secrets["INTERVAL"]
+    result = fetch_data_endpoint(timeframe)
     print(result)
     print("done")
