@@ -1,5 +1,5 @@
 # @title
-import streamlit as st
+import sys
 import math
 import traceback
 from tvDatafeed import TvDatafeed, Interval
@@ -917,12 +917,10 @@ def fetch_data_endpoint(timeframe):
 if __name__ == "__main__":
     # Safely access the timeframe from Streamlit secrets
     try:
-        timeframe = st.secrets["INTERVAL"]
+        timeframe = sys.argv[1]
     except KeyError:
         st.error("Please set the 'INTERVAL' in Streamlit secrets.")
         st.stop()
 
-    # Button to trigger fetch_data_endpoint
-    if st.button("Fetch Data"):
-        result = fetch_data_endpoint(timeframe)
-        st.write('done')
+    result = fetch_data_endpoint(timeframe)
+    print('done')  # This print statement will show in the terminal, not in Streamlit
