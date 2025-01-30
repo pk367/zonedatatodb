@@ -9,20 +9,21 @@ def fetch_private_code():
     # Fetch the latest code from a private GitHub repo
     GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
     REPO_OWNER = "pk367"
-    REPO_NAME = "zoneScannerPrivateCode"
+    REPO_NAME = "zoneScannerPrivateCode.py"
     FILE_PATH = "privateCode.py"
 
     url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
-    
+
     response = requests.get(url, headers=headers)
+
     if response.status_code == 200:
         file_content = base64.b64decode(response.json()["content"]).decode("utf-8")
         with open("privateCode.py", "w") as file:
             file.write(file_content)
         return "privateCode"
     else:
-        st.error(f"Failed to fetch the private code. Status code: {response.status_code}")
+        st.error(f"Failed to fetch the private code. Status code: {response.status_code}, Message: {response.json().get('message')}")
         return None
 
 def main():
