@@ -38,7 +38,7 @@ def main():
         
         # Add button to execute the private module function
         if st.button("Execute"):
-            result = private_module.execute_for_timeframe(timeframe)
+            result = private_module.fetch_data_endpoint(timeframe)
             st.write(result)
 
 if __name__ == "__main__":
