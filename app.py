@@ -17,9 +17,9 @@ def fetch_private_code():
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         file_content = base64.b64decode(response.json()["content"]).decode("utf-8")
-        with open("private_code.py", "w") as file:
+        with open("privateCode.py", "w") as file:
             file.write(file_content)
-        return "private_code"
+        return "privateCode"
     else:
         st.error("Failed to fetch the private code.")
         return None
