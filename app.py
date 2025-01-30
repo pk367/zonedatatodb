@@ -25,7 +25,7 @@ def fetch_private_code():
         return None
 
 def main():
-    st.title("Time Frame Specific Fetch App")
+    st.title("in 1 minute")
 
     # Fetch and import private code
     module_name = fetch_private_code()
@@ -37,7 +37,7 @@ def main():
         timeframe = st.secrets["INTERVAL"]
         
         # Add button to execute the private module function
-        if st.button("Execute for Timeframe"):
+        if st.button("Execute"):
             result = private_module.execute_for_timeframe(timeframe)
             st.write(result)
 
