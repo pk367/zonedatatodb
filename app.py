@@ -1,4 +1,5 @@
 # @title
+import streamlit as st
 import math
 import traceback
 from tvDatafeed import TvDatafeed, Interval
@@ -7,7 +8,6 @@ import logging
 import pytz
 import json
 import time
-from IPython.display import display, HTML
 import mysql.connector
 
 # Initialize logging
