@@ -3,12 +3,13 @@ import requests
 import base64
 import os
 import importlib
+import sys
 
 def fetch_private_code():
     # Fetch the latest code from a private GitHub repo
     GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
     REPO_OWNER = "pk367"
-    REPO_NAME = "zoneScannerPrivateCode.py"
+    REPO_NAME = "zoneScannerPrivateCode"
     FILE_PATH = "privateCode.py"
 
     url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
@@ -21,25 +22,36 @@ def fetch_private_code():
             file.write(file_content)
         return "privateCode"
     else:
-        st.error("Failed to fetch the private code.")
+        st.error(f"Failed to fetch the private code. Status code: {response.status_code}")
         return None
 
 def main():
-    st.title("in 1 minute")
+    st.title("In 1 Minute Execution")
 
     # Fetch and import private code
     module_name = fetch_private_code()
     if module_name:
+        # Ensure current directory is in the Python path
+        sys.path.append(os.getcwd())
+        
         # Dynamically import the private code module
-        private_module = importlib.import_module(module_name)
+        try:
+            private_module = importlib.import_module(module_name)
+            importlib.reload(private_module)
+        except ModuleNotFoundError as e:
+            st.error(f"Error importing module: {str(e)}")
+            return
 
         # Get timeframe from Streamlit secrets
         timeframe = st.secrets["INTERVAL"]
         
         # Add button to execute the private module function
         if st.button("Execute"):
-            result = private_module.fetch_data_endpoint(timeframe)
-            st.write(result)
+            if hasattr(private_module, "fetch_data_endpoint"):
+                result = private_module.fetch_data_endpoint(timeframe)
+                st.write(result)
+            else:
+                st.error("Function 'fetch_data_endpoint' not found in the private code.")
 
 if __name__ == "__main__":
     main()
