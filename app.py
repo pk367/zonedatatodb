@@ -905,7 +905,14 @@ def fetch_data_endpoint(timeframe):
                   connections['zone'].close()
 
 if __name__ == "__main__":
-    timeframe = st.secrets["INTERVAL"]
-    result = fetch_data_endpoint(timeframe)
-    print(result)
-    print("done")
+    # Safely access the timeframe from Streamlit secrets
+    try:
+        timeframe = st.secrets["INTERVAL"]
+    except KeyError:
+        st.error("Please set the 'INTERVAL' in Streamlit secrets.")
+        st.stop()
+
+    # Button to trigger fetch_data_endpoint
+    if st.button("Fetch Data"):
+        result = fetch_data_endpoint(timeframe)
+        st.write('done')
