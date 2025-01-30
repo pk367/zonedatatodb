@@ -321,8 +321,10 @@ def find_patterns(ticker,exchange, stock_data,  interval_key, max_base_candles,r
 
                                 # time_in_exit = exit_index - entry_index
                                 Pattern_name_is = 'DZ(DBR)' if stock_data['open'].iloc[legin_candle_index] > stock_data['close'].iloc[legin_candle_index] else 'DZ(RBR)'
-                                legin_base_legout_ranges = f"{round(legin_candle_range / actual_base_candle_range)}:1:{round(legout_candle_range / actual_base_candle_range)}"
-
+                                if actual_base_candle_range == 0:
+                                    legin_base_legout_ranges = f"{round(legin_candle_range)}:1:{round(legout_candle_range)}"
+                                else:
+                                    legin_base_legout_ranges = f"{round(legin_candle_range / actual_base_candle_range)}:1:{round(legout_candle_range / actual_base_candle_range)}"
                                 #ohlc_data = capture_ohlc_data(stock_data, exit_index, i)
                                 #print(f"entry date is :{stock_data.index[m]}")
                                 pulse_check_start_date = pd.to_datetime(entry_date).strftime('%Y-%m-%d %H:%M:%S') if entry_date is not None else pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -574,8 +576,10 @@ def find_patterns(ticker,exchange, stock_data,  interval_key, max_base_candles,r
 
                                 latest_closing_price = round(stock_data['close'].iloc[-1], 2)
                                 zone_distance = (min(low_prices) - math.floor(latest_closing_price)) / min(low_prices) * 100
-                                legin_base_legout_ranges = f"{round(legin_candle_range / actual_base_candle_range)}:1:{round(legout_candle_range / actual_base_candle_range)}"
-
+                                if actual_base_candle_range == 0:
+                                    legin_base_legout_ranges = f"{round(legin_candle_range)}:1:{round(legout_candle_range)}"
+                                else:
+                                    legin_base_legout_ranges = f"{round(legin_candle_range / actual_base_candle_range)}:1:{round(legout_candle_range / actual_base_candle_range)}"
                                 
                                 if ((fresh_zone_allowed and Zone_status == 'Fresh') or \
                                    (target_zone_allowed and (Zone_status == 'Tested' or Zone_status == 'Successful')) or \
